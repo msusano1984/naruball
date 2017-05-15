@@ -1,31 +1,31 @@
 <?php
 
-class usuarios
+class feed_imagenes
 {
 
-	public function __construct($admin = "", $nombre = "", $id_usuario = 0)
+  
 
-	{
-		$this->admin = $admin;
-        $this->nombre = $nombre;
-        $this->id_usuario = $id_usuario;
-	}
+    public function __construct($imagen_id = "", $post_id = "", $url = "")
+    {
+        $this->imagen_id = $imagen_id;
+        $this->post_id = $post_id;
+        $this->url = $url;
+        
+    }
 
-	// Datos de la tabla "usuarios"
-    const NOMBRE_TABLA = "usuarios";
+    // Datos de la tabla "feed_imagenes"
+    const NOMBRE_TABLA = "feed_imagenes";
 
-    const ADMIN = "admin";
-    const NOMBRE = "nombre";
-    const ID_USUARIO = "id_usuario";
-    const ESTADO_URL_INCORRECTA = "url_incorrecta";
-    const ESTADO_CREACION_EXITOSA = "OK";
-    const ESTADO_CREACION_FALLIDA = "ERROR";
+    const IMAGEN_ID = "imagen_id";
+    const POST_ID = "post_id";
+    const URL = "url";
 
-	public static function post($peticion)
+    
+    public static function post($peticion)
     {
         if ($peticion[0] == 'registro') {
             return self::registrar();
-        }   
+        } 
         else if ($peticion[0] == "listar")
         {
             return self::listar($_POST);
@@ -36,7 +36,7 @@ class usuarios
     }   
 
     
-    private function crear($usuarios)
+    private function crear($feed_imagenes)
     {
         
 
@@ -46,23 +46,22 @@ class usuarios
 
             // Sentencia INSERT
             $comando = "INSERT INTO " . self::NOMBRE_TABLA . " ( " .
-                self::ADMIN . "," .
-                self::NOMBRE . "," .
-                self::ID_USUARIO . ")" .
+                self::IMAGEN_ID . "," .
+                self::POST_ID . "," .
+                self::URL . "," .
                 " VALUES(?,?,?)";
        
             $sentencia = $pdo->prepare($comando);
 
-            $sentencia->bindParam(1, $usuarios[self::ADMIN]);
+            $sentencia->bindParam(1, $feed_imagenes[self::IMAGEN_ID]);
+                       
+            $sentencia->bindParam(2, $feed_imagenes[self::POST_ID]);
+                       
+            $sentencia->bindParam(3, $feed_imagenes[self::URL]);
 
-            $sentencia->bindParam(2, $usuarios[self::NOMBRE]);
-
-            $sentencia->bindParam(3, $usuarios[self::ID_USUARIO]);
-             
-                        
+            
             $resultado = $sentencia->execute();
-
-
+           
             if ($resultado) {
 
                 
@@ -100,20 +99,16 @@ class usuarios
     }
 
 
-    private function listar($usuarios){
+    private function listar($feed_imagenes){
 
-      //  $idpost = $feed[self::POST_ID];
+        $idpost = $feed_imagenes[self::POST_ID];
 
-        if($_GET['id_usuario']==    '0'){
-            $comando = "SELECT ".self::ADMIN . ",".self::NOMBRE .",".self::ID_USUARIO ." from ".self::NOMBRE_TABLA;
-        }else {
-           $comando = "SELECT ".self::ADMIN . ",".self::NOMBRE .",".self::ID_USUARIO ." from ".self::NOMBRE_TABLA ." where ".self::ID_USUARIO . " = ? "; 
-        }
+        $comando = "SELECT ".self::POST_ID . ",".self::IMAGEN_ID .",".self::URL."  from ".self::NOMBRE_TABLA." where ".self::POST_ID."=? ";
         
         $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($comando);
-        
-        $sentencia->bindParam(1, $_GET['id_usuario']);
-        
+        $sentencia->bindParam(1, $idpost);
+
+
         if ($sentencia->execute())
         {
             return  $sentencia->fetchall(PDO::FETCH_ASSOC);
@@ -124,4 +119,8 @@ class usuarios
             return "error";
         }
     }
+
+    
+
+    
 }

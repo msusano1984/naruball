@@ -60,8 +60,6 @@ class ConexionBD
                 array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
             );
 
-print_r('mysql:dbname=' . BASE_DE_DATOS .';host=' . NOMBRE_HOST . ";" . USUARIO ."; ".CONTRASENA .";";
-
             // Habilitar excepciones
             self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
