@@ -1,30 +1,37 @@
 <?php
-require_once("views/VistaApi.php");
-require_once("views/VistaJson.php");
+
+require_once("utils/ExcepcionApi.php");
+require_once("utils/Utilerias.php");
+require_once("vistas/VistaApi.php");
+require_once("vistas/VistaJson.php");
+require_once("vistas/VistaXML.php");
+require_once("data/ConexionBD.php");
+require_once("data/login_mysql.php");
+require_once("controladores/feed_imagenes.php");
+require_once("controladores/feed.php");
+require_once("controladores/participantes.php");
 require_once("controladores/usuarios.php");
-require_once('utils/ConexionBD.php');
-require_once('utils/ExcepcionApi.php');
-require_once('utils/Utilerias.php');
 
 
-//print ConexionBD::obtenerInstancia()->obtenerBD()->errorCode();
-//print_r(array_shift($_GET['PATH_INFO']));
+
+
+
 
 $vista = new VistaJson();
 
 set_exception_handler(function ($exception) use ($vista) {
-	    $cuerpo = array(
-	        "estado" => $exception->estado,
-	        "mensaje" => $exception->getMessage()
-	    );
-	    if ($exception->getCode()) {
-	        $vista->estado = $exception->getCode();
-	    } else {
-	        $vista->estado = 500;
-	    }
+        $cuerpo = array(
+            "estados" => $exception->estados,
+            "mensaje" => $exception->getMessage()
+        );
+        if ($exception->getCode()) {
+            $vista->estados = $exception->getCode();
+        } else {
+            $vista->estados = 500;
+        }
 
-	    $vista->imprimir($cuerpo);
-	}
+        $vista->imprimir($cuerpo);
+    }
 );
 
 
@@ -37,11 +44,12 @@ set_exception_handler(function ($exception) use ($vista) {
 
 
 
+
 $metodo = strtolower($_SERVER['REQUEST_METHOD']);
 
 
 $arreglo = explode('/', $_GET['PATH_INFO']);
-$modelo = $arreglo[0];
+$controlador = $arreglo[0];
 
 $arreglo = array_pop($arreglo);
 $arreglo = explode(' ',$arreglo);
@@ -51,10 +59,9 @@ switch ($metodo) {
         break;
 
     case 'post':
-
-    	ejecutaModeloPost($vista, $modelo, $arreglo);
-    	//$vista->imprimir(usuarios::post($arreglo));
-		
+        
+        ejecutaModeloPost($vista, $controlador, $arreglo);
+        
         break;
 
     case 'put':
@@ -69,15 +76,19 @@ switch ($metodo) {
 }
 
 
-function ejecutaModeloPost($vista, $mod, $arr)
+
+
+function ejecutaModeloPost($vista, $controlador, $arr)
 {
 
-    switch ($mod) {
-    	case 'usuarios':
-    		$vista->imprimir(usuarios::post($arr));
-    		break;
+    switch (strtolower($controlador)) {
+        case 'usuarios':
+
+            $vista->imprimir(usuarios::post($arr));
+            break;
+       
         default:
-    		# code...
-    		break;
+            # code...
+            break;
     }
 }

@@ -1,9 +1,9 @@
-<?php
+    <?php
 
 class feed
 {
 
-    public function __construct($created_time = "", $created_usuario_id = 0, $fecha_evento = "", $id_post = 0, $mensaje = "", $tipo_posteo = "")
+    public function __construct($created_time, $created_usuario_id , $fecha_evento , $id_post, $mensaje, $tipo_posteo,$permalink, $estatus = 1 )
 
     {        
         $this->created_time = $created_time;
@@ -12,7 +12,8 @@ class feed
         $this->id_post = $id_post;
         $this->mensaje = $mensaje;
         $this->tipo_posteo = $tipo_posteo;
-       
+        $this->permalink = $permalink;
+        $this->estatus = $estatus;
     }
 
     // Datos de la tabla "feed"
@@ -24,21 +25,54 @@ class feed
     const ID_POST = "id_post";
     const MENSAJE = "mensaje";
     const TIPO_POSTEO = "tipo_posteo";
+    const PERMALINK = "permalink";
+    const ESTATUS = "estatus";
+    const ESTADO_URL_INCORRECTA = "estado_url_incorrecta";
+    const ESTADO_CREACION_EXITOSA = "OK";
+    const ESTADO_CREACION_FALLIDA = "ERROR";
 
 
     public static function post($peticion)
     {
-        if ($peticion[0] == 'registro') {
-            return self::registrar();
+        if ($peticion[0] == 'crear') {
+            return self::crear($_POST);
         } 
         else if ($peticion[0] == "listar")
         {
             return self::listar($_POST);
 
-        } else {
+        } else if ($peticion[0] == "guardaFeed")
+            return self::guardaFeed($_POST);
+        else {
             throw new ExcepcionApi(self::ESTADO_URL_INCORRECTA, "Url mal formada", 400);
         }
     }   
+
+      
+
+
+
+    private function guardaFeed($feed){
+
+
+        $feed = json_decode($feed["data"]);
+        
+
+
+        try{
+            foreach($feed as $row){
+              print_r($row);
+
+                self::crear($row);  
+            }
+            return true;
+
+        }catch (PDOException $e) {
+
+            return false;
+        }
+        
+    }
 
     
     private function crear($feed)
@@ -57,72 +91,53 @@ class feed
                 self::ID_POST . "," .
                 self::MENSAJE . "," .
                 self::TIPO_POSTEO . "," .
-                " VALUES(?,?,?,?,?,?)";
+                self::PERMALINK . ")" .
+                " VALUES(?,?,?,?,?,?,?)";
        
             $sentencia = $pdo->prepare($comando);
 
-            $sentencia->bindParam(1, $feed[self::CREATED_TIME]);
+            $sentencia->bindParam(1, $feed->created_time);
                        
-            $sentencia->bindParam(2, $feed[self::CREATED_USUARIO_ID]);
+            $sentencia->bindParam(2, $feed->created_usuario_id);
                        
-            $sentencia->bindParam(3, $feed[self::FECHA_EVENTO]);
+            $sentencia->bindParam(3, $feed->fecha_evento);
 
-            $sentencia->bindParam(3, $feed[self::ID_POST]);
+            $sentencia->bindParam(4, $feed->id_post);
 
-            $sentencia->bindParam(3, $feed[self::MENSAJE]);
+            $sentencia->bindParam(5, $feed->mensaje);
 
-            $sentencia->bindParam(3, $feed[self::TIPO_POSTEO]);
+            $sentencia->bindParam(6, $feed->tipo_posteo);
 
-
-
+            $sentencia->bindParam(7, $feed->permalink);
             
             $resultado = $sentencia->execute();
            
             if ($resultado) {
 
                 
-                return self::ESTADO_CREACION_EXITOSA;
+                return true;
             } else {
-                return self::ESTADO_CREACION_FALLIDA;
+                return false;
             }
-        } catch (PDOException $e) {
-
-            throw new ExcepcionApi(self::ESTADO_URL_INCORRECTA, $e->getMessage(), 400);
+        } catch (Exception $e) {
+            print_r($e);    
+            
+            return false;
             
         }
 
     }
    
-    private function registrar()
-    {
-        $cuerpo = file_get_contents('php://input');
-        $usuario = json_decode($cuerpo);
-
-        $resultado = self::crear($_POST);
-
-        switch ($resultado) {
-            case self::ESTADO_CREACION_EXITOSA:
-               http_response_code(200);
-               return "OK";
-               
-                break;
-            case self::ESTADO_CREACION_FALLIDA:
-                throw new ExcepcionApi(self::ESTADO_CREACION_FALLIDA, "Ha ocurrido un error");
-                break;
-            default:
-                throw new ExcepcionApi(self::ESTADO_FALLA_DESCONOCIDA, "Falla desconocida", 400);
-        }
-    }
+    
 
 
     private function listar($feed){
 
-        $idpost = $feed[self::POST_ID];
 
-        $comando = "SELECT ".self::CREATED_TIME . ",".self::CREATED_USUARIO_ID .",".self::FECHA_EVENTO .",".self::ID_POST .",".self::MENSAJE .",".self::TIPO_POSTEO ." from ".self::NOMBRE_TABLA." =? ";
+        $comando = "SELECT ".self::CREATED_TIME . ",".self::CREATED_USUARIO_ID .",".self::FECHA_EVENTO .",".self::ID_POST .",".self::MENSAJE .",".self::TIPO_POSTEO . "," .self::PERMALINK. "," .self::ESTATUS ." from ".self::NOMBRE_TABLA;
         
         $sentencia = ConexionBD::obtenerInstancia()->obtenerBD()->prepare($comando);
-        $sentencia->bindParam(1, $idpost);
+       // $sentencia->bindParam(1, $idpost);
 
 
         if ($sentencia->execute())

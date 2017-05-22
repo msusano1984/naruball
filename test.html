@@ -1,0 +1,104 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>.:prueba api FB:.</title>
+<script type="text/javascript" src="scripts/jquery.js" ></script>
+<script type="text/javascript" src="scripts/request.js" ></script>
+<script type="text/javascript" src="scripts/entities.js" ></script>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1283276868394670',
+      xfbml      : true,
+      version    : 'v2.9'
+    });
+
+    FB.AppEvents.logPageView();
+     $(document).trigger('fbload');
+ 
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+
+
+$(document).on(
+    'fbload',  //  <---- HERE'S OUR CUSTOM EVENT BEING LISTENED FOR
+    function(){
+	
+		FB.getLoginStatus(function(response) {
+		  if (response.status === 'connected') {
+		  debugger;
+			var accessToken = response.authResponse.accessToken;
+			
+			/*
+			$.get( "https://graph.facebook.com/v2.9/178516459324845/members?access_token="+accessToken, function( data ) {
+					debugger;
+					alert(data);
+			});
+			*/
+			
+			$.ajax({
+			  dataType: "json",
+			  url: "https://graph.facebook.com/v2.9/178516459324845/members?access_token="+accessToken,			  
+			  success: function(o){
+              /*
+              var datos = new Array();
+              for(i in o.data){
+                
+                var u = new usuarios(((o.data[i].administrator)?1:0), o.data[i].nombre, o.data[i].id, 1);
+                datos.pop(u); 
+              }
+              */
+
+				      postrequest("usuarios/crearusuarios",{"data":JSON.stringify(o.data)},function(data){
+                alert(data);
+               });
+			   }
+			});
+
+		  } 
+		});
+	});
+		
+		
+		//extender token al mes
+		//
+   
+   
+   /*
+
+$(document).on(
+    'fbload',  //  <---- HERE'S OUR CUSTOM EVENT BEING LISTENED FOR
+    function(){
+	
+	
+	
+	
+	
+	
+				
+			var token = "EAASPIi3jnq4BAEJi6GJLEAu6ay7JnDWrNGDhcd08RdQNsOywhAwTwPet9DrthB5ZCgxeGjZASMp2PSujUByDQCceflVB690zr9gfc1bnkHIhH3VZB8msZCmyVcNHGZCK2cR78K1ZBt4RTMZAOCLWifl";
+				
+			$.get( "https://graph.facebook.com/v2.9/oauth/access_token?client_id=1283276868394670&client_secret=b64b932bfab23df33ebd06687ea75917&grant_type=client_credentials&access_token="+token, function( data ) {
+			  token = data.access_token;			  
+			  alert(token);
+				debugger;
+				$.get( "https://graph.facebook.com/v2.9/178516459324845/members?access_token="+token, function( data ) {
+						debugger;
+						alert(data);
+				});
+			});
+    });
+  */
+</script>
+</head>
+<body>
+</body>
+</html>

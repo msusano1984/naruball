@@ -1,0 +1,2 @@
+[18-May-2017 00:34:39 UTC] PHP Parse error:  syntax error, unexpected 'self' (T_STRING) in /home/msusano1984/public_html/naruball.com/controladores/usuarios.php on line 55
+[18-May-2017 00:34:52 UTC] PHP Parse error:  syntax error, unexpected 'self' (T_STRING) in /home/msusano1984/public_html/naruball.com/controladores/usuarios.php on line 55
