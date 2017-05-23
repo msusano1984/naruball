@@ -42,7 +42,6 @@ class feed_imagenes
 
         try {
 
-            print_r($feed_imagenes);
             $pdo = ConexionBD::obtenerInstancia()->obtenerBD();
 
             // Sentencia INSERT
@@ -50,11 +49,11 @@ class feed_imagenes
        
             $sentencia = $pdo->prepare($comando);
 
-            $sentencia->bindParam(1, $feed_imagenes["data"]->imagen_id);
+            $sentencia->bindParam(1, $feed->imagen_id);
                        
-            $sentencia->bindParam(2, $feed_imagenes["data"]->post_id);
+            $sentencia->bindParam(2, $feed->post_id);
                        
-            $sentencia->bindParam(3, $feed_imagenes["data"]->url);
+            $sentencia->bindParam(3, $feed->url);
 
             
             $resultado = $sentencia->execute();

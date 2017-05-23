@@ -16,16 +16,16 @@ require_once("controladores/usuarios.php");
 
 
 
-$_POST["data"] =json_encode(array(new feed ( "2017-04-06T05:08", 1, "017-05-19", "178516459324845_184281512081673", "Holaaaaaa", "rifa", "http://google.com", 1 )));
+$_POST["data"] = new feed_imagenes ("12", "178516459324845_184281512081673", "https://scontent.xx.fbcdn.net/v/t1.0-9/17626241_10212632101263439_7325447554296829101_n.jpg?oh=3235d62ca45e22712aba8f94bec0fca8&oe=59B0CB1B");
 
  //$_POST = array("admin"=>1, "nombre"=>"Caro", "	"=>"3");
- //$_POST = array("created_time"=>1, "created_usuario_id"=>"2", "fecha_evento"=>"19_05_17", "id_post"=> "3333333666333", "mensaje"=>"Holaaa","tipo_posteo"=>"rifa");
+ //$_POST = array("fecha_evento"=>"2017-05-20", "id_post"=> "3333333333","tipo_posteo"=>"video", "estatus"=>0);
  //print_r($_POST);
 
 
-$arr = array("guardaFeed");
+$arr = array("insertar");
 $vista = new VistaJson();
-print_r($vista->imprimir(feed::post($arr)));
+print_r($vista->imprimir(feed_imagenes::post($arr)));
 
 
 

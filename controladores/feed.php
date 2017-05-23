@@ -31,23 +31,30 @@ class feed
     const ESTADO_CREACION_EXITOSA = "OK";
     const ESTADO_CREACION_FALLIDA = "ERROR";
 
+   
 
     public static function post($peticion)
-    {
-        if ($peticion[0] == 'crear') {
-            return self::crear($_POST);
-        } 
-        else if ($peticion[0] == "listar")
         {
-            return self::listar($_POST);
+            if ($peticion[0] == 'crear') {
+                return self::crear($_POST);
+            } 
+            else if ($peticion[0] == "listar")
+            {
+                return self::listar($_POST);
 
-        } else if ($peticion[0] == "guardaFeed")
-            return self::guardaFeed($_POST);
-        else {
-            throw new ExcepcionApi(self::ESTADO_URL_INCORRECTA, "Url mal formada", 400);
+            }
+            else if ($peticion[0] == "guardaFeed")
+            {
+                return self::guardaFeed($_POST);
+            }
+            else if ($peticion[0] == "actualizar")
+            {
+                return self::actualizar($_POST);
+            }
+            else {
+                throw new ExcepcionApi(self::ESTADO_URL_INCORRECTA, "Url mal formada", 400);
+            }
         }
-    }   
-
       
 
 
@@ -109,6 +116,47 @@ class feed
             $sentencia->bindParam(6, $feed->tipo_posteo);
 
             $sentencia->bindParam(7, $feed->permalink);
+            
+            $resultado = $sentencia->execute();
+           
+            if ($resultado) {
+
+                
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            print_r($e);    
+            
+            return false;
+            
+        }
+
+    }
+
+    private function actualizar($feed)
+    {
+        
+
+        try {
+
+            $pdo = ConexionBD::obtenerInstancia()->obtenerBD();
+
+            // Sentencia Actualizar
+            $comando = "UPDATE feed SET fecha_evento = ?, estatus = ?, tipo_posteo = ? WHERE id_post = ?";
+       
+            $sentencia = $pdo->prepare($comando);
+
+            $sentencia->bindParam(1, $feed["fecha_evento"]);
+                                  
+            $sentencia->bindParam(2, $feed["estatus"]);
+
+            $sentencia->bindParam(3, $feed["tipo_posteo"]);
+
+            $sentencia->bindParam(4, $feed["id_post"]);
+
+
             
             $resultado = $sentencia->execute();
            
